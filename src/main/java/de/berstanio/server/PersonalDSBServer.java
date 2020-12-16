@@ -17,6 +17,7 @@ public class PersonalDSBServer {
 
     private static HashMap<Integer, Plan> plans11 = new HashMap<>();
     private static HashMap<Integer, Plan> plans12 = new HashMap<>();
+    private static String freeRooms;
 
     public static void main(String[] args) throws IOException, DSBNotLoadableException {
         GHGParser.init(GHGParser.class.getResourceAsStream("/rawPage.htm"), new File("user"));
@@ -28,9 +29,10 @@ public class PersonalDSBServer {
                 try {
                     boolean b = update();
                     if (b){
+                        updateFreeRooms();
                         //Sende Nachricht an alle Clients
                     }
-                } catch (DSBNotLoadableException e) {
+                } catch (DSBNotLoadableException | IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -57,7 +59,19 @@ public class PersonalDSBServer {
         return true;
     }
 
+    public static void updateFreeRooms() throws IOException {
+        setFreeRooms(FreeRoomDSB.refresh());
+    }
+
     public static HashMap<Integer, Plan> getPlans(int year) {
         return year == 12 ? plans12 : plans11;
+    }
+
+    public static String getFreeRooms() {
+        return freeRooms;
+    }
+
+    public static void setFreeRooms(String freeRooms) {
+        PersonalDSBServer.freeRooms = freeRooms;
     }
 }

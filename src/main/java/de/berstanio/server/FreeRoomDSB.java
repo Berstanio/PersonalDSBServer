@@ -63,9 +63,10 @@ public class FreeRoomDSB {
                 String identifier = dayOfWeek.name().substring(0, 2) + (i + 1);
                 for (int j = 3; j < stringBuilder.length(); j += 4) {
                     if (j% 3 == 0){
-                        s = s.replace(identifier + "R", stringBuilder.substring(j-3,j) + "<br>" + identifier + "R");
                         if (j + 4 == stringBuilder.length()){
                             s = s.replace(identifier + "C", stringBuilder.substring(j-3,j) + "<br>" + identifier + "C");
+                        }else {
+                            s = s.replace(identifier + "R", stringBuilder.substring(j-3,j) + "<br>" + identifier + "R");
                         }
                     }else if(j % 3 == 1){
                         s = s.replace(identifier + "C", stringBuilder.substring(j-3,j) + "<br>" + identifier + "C");

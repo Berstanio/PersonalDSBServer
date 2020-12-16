@@ -30,7 +30,9 @@ public class DSBSocket {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(client.getOutputStream());
             int week = objectInputStream.readInt();
 
-            if (week == 0) {
+            if (week == -1){
+                objectOutputStream.writeObject(PersonalDSBServer.getFreeRooms());
+            }else if (week == 0) {
                 int year = objectInputStream.readInt();
                 objectOutputStream.writeObject(GHGParser.getJahresStundenPlan(year));
             } else {

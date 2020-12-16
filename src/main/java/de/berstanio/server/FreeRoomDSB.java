@@ -33,8 +33,14 @@ import de.berstanio.ghgparser.DayOfWeek;
 
 public class FreeRoomDSB {
 
+    public static String html = "";
+
     public static void main(String[] args) throws IOException {
         Files.write(Paths.get("out.html"), refresh().getBytes(StandardCharsets.UTF_8));
+    }
+
+    static {
+        html = readHtmlFile();
     }
 
     public static String readHtmlFile(){
@@ -49,12 +55,12 @@ public class FreeRoomDSB {
             return stringBuilder.toString();
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            return "";
         }
     }
 
     public static String generateHTML(HashMap<DayOfWeek, ArrayList<String>> dayMap){
-        String s = readHtmlFile();
+        String s = html;
         for (Map.Entry<DayOfWeek, ArrayList<String>> entry : dayMap.entrySet()) {
             DayOfWeek dayOfWeek = entry.getKey();
             ArrayList<String> strings = entry.getValue();

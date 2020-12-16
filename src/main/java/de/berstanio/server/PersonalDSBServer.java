@@ -22,6 +22,7 @@ public class PersonalDSBServer {
     public static void main(String[] args) throws IOException, DSBNotLoadableException {
         GHGParser.init(GHGParser.class.getResourceAsStream("/rawPage.htm"), new File("user"));
         DSBSocket dsbSocket = new DSBSocket(InetAddress.getByName("62.75.210.82"), 21589);
+        dsbSocket.start();
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override

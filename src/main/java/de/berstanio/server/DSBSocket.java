@@ -17,6 +17,10 @@ public class DSBSocket {
 
     public DSBSocket(InetAddress address, int port) throws IOException {
         setSocket(new ServerSocket(port, 50, address));
+
+    }
+
+    public void start(){
         new Thread(this::listen).start();
     }
 

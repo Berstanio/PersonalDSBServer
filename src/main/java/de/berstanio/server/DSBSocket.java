@@ -29,9 +29,15 @@ public class DSBSocket {
             ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(client.getOutputStream());
             int week = objectInputStream.readInt();
-            User user = (User) objectInputStream.readObject();
-            String html = GHGParser.generateHtmlFile(user, PersonalDSBServer.getPlans(user.getYear()).get(week));
-            objectOutputStream.writeObject(html);
+
+            if (week == 0) {
+                int year = objectInputStream.readInt();
+                objectOutputStream.writeObject(GHGParser.getJahresStundenPlan(year));
+            } else {
+                User user = (User) objectInputStream.readObject();
+                String html = GHGParser.generateHtmlFile(user, PersonalDSBServer.getPlans(user.getYear()).get(week));
+                objectOutputStream.writeObject(html);
+            }
             objectOutputStream.flush();
 
             objectOutputStream.close();

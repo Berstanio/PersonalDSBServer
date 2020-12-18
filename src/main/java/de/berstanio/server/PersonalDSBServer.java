@@ -57,7 +57,7 @@ public class PersonalDSBServer {
                         return false;
                     }
                 }
-                getPlans(year).put(tmpWeek, new Plan(year, tmpWeek));
+                getPlans(year).put(tmpWeek, plan);
             }
         }
         return true;

@@ -30,6 +30,7 @@ public class PersonalDSBServer {
                 try {
                     boolean b = update();
                     if (b){
+                        System.out.println("Update gefunden!");
                         updateFreeRooms();
                         //Sende Nachricht an alle Clients
                     }
@@ -37,7 +38,7 @@ public class PersonalDSBServer {
                     e.printStackTrace();
                 }
             }
-        }, 500, TimeUnit.MINUTES.toMicros(5));
+        }, 500, TimeUnit.MINUTES.toMillis(5));
     }
 
     public static boolean update() throws DSBNotLoadableException {
@@ -50,7 +51,9 @@ public class PersonalDSBServer {
                 int tmpWeek = week + j;
                 Plan plan = new Plan(year, tmpWeek);
                 if (getPlans(year).containsKey(tmpWeek)){
+                    System.out.println("Vergleiche " + plan.getLastUpdate().toString() + " mit altem " + getPlans(year).get(tmpWeek).getLastUpdate());
                     if (!plan.getLastUpdate().after(getPlans(year).get(tmpWeek).getLastUpdate())){
+                        System.out.println("Kein Update wird durchgeführt!");
                         return false;
                     }
                 }

@@ -38,6 +38,7 @@ public class DSBSocket {
                 objectOutputStream.writeObject(PersonalDSBServer.getFreeRooms());
             }else if (week == 0) {
                 int year = objectInputStream.readInt();
+                // TODO: 18.12.2020 Jahresstundeplan regelmäßig updaten
                 objectOutputStream.writeObject(GHGParser.getJahresStundenPlan(year));
             } else {
                 User user = (User) objectInputStream.readObject();

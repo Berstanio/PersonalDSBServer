@@ -25,18 +25,20 @@ public class DSBSocket {
     }
 
     public void listen(){
-        try {
-            System.out.println("Listen to new client!");
-            Socket client = getSocket().accept();
+        System.out.println("Listen to new client!");
+
+        boolean b = false;
+        try (Socket client = getSocket().accept()) {
             new Thread(this::listen).start();
+            b = true;
             System.out.println(client.getInetAddress().getHostAddress() + " hat sich verbunden");
             ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(client.getOutputStream());
             int week = objectInputStream.readInt();
 
-            if (week == -1){
+            if (week == -1) {
                 objectOutputStream.writeObject(PersonalDSBServer.getFreeRooms());
-            }else if (week == 0) {
+            } else if (week == 0) {
                 int year = objectInputStream.readInt();
                 // TODO: 18.12.2020 Jahresstundeplan regelmäßig updaten
                 objectOutputStream.writeObject(GHGParser.getJahresStundenPlan(year));
@@ -49,8 +51,10 @@ public class DSBSocket {
 
             objectOutputStream.close();
             objectInputStream.close();
-            client.close();
         } catch (IOException | ClassNotFoundException | DSBNotLoadableException e) {
+            if (!b){
+                new Thread(this::listen).start();
+            }
             e.printStackTrace();
         }
     }

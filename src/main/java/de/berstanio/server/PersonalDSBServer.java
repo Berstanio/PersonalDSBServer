@@ -18,7 +18,7 @@ public class PersonalDSBServer {
     private static HashMap<Integer, Plan> plans11 = new HashMap<>();
     private static HashMap<Integer, Plan> plans12 = new HashMap<>();
     private static String freeRooms;
-    private static HashMap<UUID, User> users = new HashMap<>();
+    private static HashMap<String, User> users = new HashMap<>();
 
     public static void main(String[] args) throws IOException, DSBNotLoadableException, ClassNotFoundException {
         loadUsers();
@@ -63,11 +63,11 @@ public class PersonalDSBServer {
     public static void loadUsers() throws IOException, ClassNotFoundException {
         if (Files.exists(Paths.get("users.yml"))){
             try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("users.yml"))){
-                setUsers((HashMap<UUID, User>) objectInputStream.readObject());
+                setUsers((HashMap<String, User>) objectInputStream.readObject());
             } catch (IOException | ClassNotFoundException e) {
                 if (Files.exists(Paths.get("usersTMP.yml"))){
                     try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("usersTMP.yml"))) {
-                        setUsers((HashMap<UUID, User>) objectInputStream.readObject());
+                        setUsers((HashMap<String, User>) objectInputStream.readObject());
                     }catch (IOException | ClassNotFoundException e2){
 
                     }
@@ -76,7 +76,7 @@ public class PersonalDSBServer {
             }
         }else if (Files.exists(Paths.get("usersTMP.yml"))){
             try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("usersTMP.yml"))) {
-                setUsers((HashMap<UUID, User>) objectInputStream.readObject());
+                setUsers((HashMap<String, User>) objectInputStream.readObject());
             }
         }
     }
@@ -119,11 +119,11 @@ public class PersonalDSBServer {
         PersonalDSBServer.freeRooms = freeRooms;
     }
 
-    public static HashMap<UUID, User> getUsers() {
+    public static HashMap<String, User> getUsers() {
         return users;
     }
 
-    public static void setUsers(HashMap<UUID, User> users) {
+    public static void setUsers(HashMap<String, User> users) {
         PersonalDSBServer.users = users;
     }
 }

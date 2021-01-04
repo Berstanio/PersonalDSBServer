@@ -102,7 +102,12 @@ public class FreeRoomDSB {
         Calendar calendar = Calendar.getInstance(Locale.GERMANY);
         int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
 
-        URL connectwat = new URL("https://light.dsbcontrol.de/DSBlightWebsite/Data/a7f2b46b-4d23-446e-8382-404d55c31f90/" + token + "/" + weekOfYear + "/r/r" + roomNumber + ".htm");
+        String week = weekOfYear + "";
+        if (week.length() == 1){
+            week = "0" + week;
+        }
+
+        URL connectwat = new URL("https://light.dsbcontrol.de/DSBlightWebsite/Data/a7f2b46b-4d23-446e-8382-404d55c31f90/" + token + "/" + week + "/r/r" + roomNumber + ".htm");
         HttpsURLConnection urlConnection = (HttpsURLConnection) connectwat.openConnection();
 
         urlConnection.connect();

@@ -34,14 +34,14 @@ public class PersonalDSBServer {
                         updateFreeRooms();
                         //Sende Nachricht an alle Clients
                     }
-                } catch (DSBNotLoadableException | IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }, 500, TimeUnit.MINUTES.toMillis(5));
     }
 
-    public static boolean update() throws DSBNotLoadableException {
+    public static boolean update() {
         Calendar calendar = Calendar.getInstance();
         int week = calendar.get(Calendar.WEEK_OF_YEAR);
 
@@ -49,15 +49,20 @@ public class PersonalDSBServer {
             int year = 11 + i;
             for (int j = 0; j < 2; j++) {
                 int tmpWeek = week + j;
-                Plan plan = new Plan(year, tmpWeek);
-                if (getPlans(year).containsKey(tmpWeek)){
-                    System.out.println("Vergleiche " + plan.getLastUpdate().toString() + " mit altem " + getPlans(year).get(tmpWeek).getLastUpdate());
-                    if (!plan.getLastUpdate().after(getPlans(year).get(tmpWeek).getLastUpdate())){
-                        System.out.println("Kein Update wird durchgeführt!");
-                        return false;
+                if (tmpWeek >= 54) tmpWeek = 1;
+                try {
+                    Plan plan = new Plan(year, tmpWeek);
+                    if (getPlans(year).containsKey(tmpWeek)) {
+                        System.out.println("Vergleiche " + plan.getLastUpdate().toString() + " mit altem " + getPlans(year).get(tmpWeek).getLastUpdate());
+                        if (!plan.getLastUpdate().after(getPlans(year).get(tmpWeek).getLastUpdate())) {
+                            System.out.println("Kein Update wird durchgeführt!");
+                            return false;
+                        }
                     }
+                    getPlans(year).put(tmpWeek, plan);
+                }catch (DSBNotLoadableException e){
+                    e.printStackTrace();
                 }
-                getPlans(year).put(tmpWeek, plan);
             }
         }
         return true;

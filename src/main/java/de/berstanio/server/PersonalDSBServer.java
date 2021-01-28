@@ -7,6 +7,7 @@ import de.berstanio.ghgparser.Plan;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Timer;
@@ -32,9 +33,11 @@ public class PersonalDSBServer {
                     if (b){
                         System.out.println("Update gefunden!");
                         updateFreeRooms();
+                        GHGParser.getJahresStundenPlan(11).refresh();
+                        GHGParser.getJahresStundenPlan(12).refresh();
                         //Sende Nachricht an alle Clients
                     }
-                } catch (DSBNotLoadableException | IOException e) {
+                } catch (DSBNotLoadableException | IOException | ParseException e) {
                     e.printStackTrace();
                 }
             }

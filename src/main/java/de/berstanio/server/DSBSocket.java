@@ -51,7 +51,7 @@ public class DSBSocket {
 
             objectOutputStream.close();
             objectInputStream.close();
-        } catch (IOException | ClassNotFoundException | DSBNotLoadableException e) {
+        } catch (IOException | ClassNotFoundException e) {
             if (!b){
                 new Thread(this::listen).start();
             }

@@ -7,7 +7,6 @@ import de.berstanio.ghgparser.Plan;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.text.ParseException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Timer;
@@ -33,18 +32,16 @@ public class PersonalDSBServer {
                     if (b){
                         System.out.println("Update gefunden!");
                         updateFreeRooms();
-                        GHGParser.getJahresStundenPlan(11).refresh();
-                        GHGParser.getJahresStundenPlan(12).refresh();
                         //Sende Nachricht an alle Clients
                     }
-                } catch (DSBNotLoadableException | IOException | ParseException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }, 500, TimeUnit.MINUTES.toMillis(5));
     }
 
-    public static boolean update() throws DSBNotLoadableException {
+    public static boolean update() {
         Calendar calendar = Calendar.getInstance();
         int week = calendar.get(Calendar.WEEK_OF_YEAR);
 
@@ -52,15 +49,20 @@ public class PersonalDSBServer {
             int year = 11 + i;
             for (int j = 0; j < 2; j++) {
                 int tmpWeek = week + j;
-                Plan plan = new Plan(year, tmpWeek);
-                if (getPlans(year).containsKey(tmpWeek)){
-                    System.out.println("Vergleiche " + plan.getLastUpdate().toString() + " mit altem " + getPlans(year).get(tmpWeek).getLastUpdate());
-                    if (!plan.getLastUpdate().after(getPlans(year).get(tmpWeek).getLastUpdate())){
-                        System.out.println("Kein Update wird durchgeführt!");
-                        return false;
+                if (tmpWeek >= 54) tmpWeek = 1;
+                try {
+                    Plan plan = new Plan(year, tmpWeek);
+                    if (getPlans(year).containsKey(tmpWeek)) {
+                        System.out.println("Vergleiche " + plan.getLastUpdate().toString() + " mit altem " + getPlans(year).get(tmpWeek).getLastUpdate());
+                        if (!plan.getLastUpdate().after(getPlans(year).get(tmpWeek).getLastUpdate())) {
+                            System.out.println("Kein Update wird durchgeführt!");
+                            return false;
+                        }
                     }
+                    getPlans(year).put(tmpWeek, plan);
+                }catch (DSBNotLoadableException e){
+                    e.printStackTrace();
                 }
-                getPlans(year).put(tmpWeek, plan);
             }
         }
         return true;

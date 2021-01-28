@@ -44,6 +44,8 @@ public class DSBSocket {
                 objectOutputStream.writeObject(GHGParser.getJahresStundenPlan(year));
             } else {
                 User user = (User) objectInputStream.readObject();
+                System.out.println(week);
+                System.out.println(user.getYear());
                 String html = GHGParser.generateHtmlFile(user, PersonalDSBServer.getPlans(user.getYear()).get(week));
                 objectOutputStream.writeObject(html);
             }

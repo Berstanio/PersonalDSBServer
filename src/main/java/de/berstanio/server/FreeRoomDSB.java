@@ -190,13 +190,18 @@ public class FreeRoomDSB {
             for (int j = 0, dayi = 0; j < days.size(); j++, dayi++) {
                 Element day = days.get(j);
                 DayOfWeek dayEnum = DayOfWeek.of(dayi+1);
+                System.out.println(room);
+                if (dayListMap.get(dayEnum) == null){
+                    System.out.println(day.text());
+                    System.out.println(room);
+                }
                 if (dayListMap.get(dayEnum).size() != z){
                     j--;
                     continue;
                 }
                 dayEnum = DayOfWeek.of(dayi+1);
                 String write;
-                if (day.attr("colspan").equals("6")){
+                if (!day.attr("colspan").equals("12")){
                     write = "";
                     j++;
                 }else if (day.getElementsByTag("tr").size() <= 1){

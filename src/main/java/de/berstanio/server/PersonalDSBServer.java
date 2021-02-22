@@ -32,9 +32,9 @@ public class PersonalDSBServer {
                     boolean b = update();
                     if (b){
                         System.out.println("Update gefunden!");
-                        updateFreeRooms();
                         GHGParser.getJahresStundenPlan(11).refresh();
                         GHGParser.getJahresStundenPlan(12).refresh();
+                        updateFreeRooms();
                         //Sende Nachricht an alle Clients
                     }
                 } catch (IOException | ParseException e) {

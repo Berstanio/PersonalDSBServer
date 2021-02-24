@@ -37,7 +37,7 @@ public class PersonalDSBServer {
                         updateFreeRooms();
                         //Sende Nachricht an alle Clients
                     }
-                } catch (IOException | ParseException e) {
+                } catch (DSBNotLoadableException e) {
                     e.printStackTrace();
                 }
             }
@@ -71,7 +71,7 @@ public class PersonalDSBServer {
         return true;
     }
 
-    public static void updateFreeRooms() throws IOException {
+    public static void updateFreeRooms() throws DSBNotLoadableException {
         setFreeRooms(FreeRoomDSB.refresh());
     }
 

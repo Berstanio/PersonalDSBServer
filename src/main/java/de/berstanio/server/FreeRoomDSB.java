@@ -2,6 +2,7 @@ package de.berstanio.server;
 
 
 
+import de.berstanio.ghgparser.DSBNotLoadableException;
 import de.berstanio.ghgparser.GHGParser;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +27,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -33,9 +35,9 @@ import de.berstanio.ghgparser.DayOfWeek;
 
 public class FreeRoomDSB {
 
-    public static String html = "";
+    public static String html;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, DSBNotLoadableException {
         Files.write(Paths.get("out.html"), refresh().getBytes(StandardCharsets.UTF_8));
     }
 
@@ -44,19 +46,13 @@ public class FreeRoomDSB {
     }
 
     public static String readHtmlFile(){
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(GHGParser.class.getResourceAsStream("/rawPage.htm")));
-            StringBuilder stringBuilder = new StringBuilder();
-            String line;
-            stringBuilder.append(bufferedReader.readLine());
-            while ((line = bufferedReader.readLine()) != null){
-                stringBuilder.append("\n").append(line);
-            }
-            return stringBuilder.toString();
+        String s = "";
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(GHGParser.class.getResourceAsStream("/rawPage.htm")))){
+            s = bufferedReader.lines().collect(Collectors.joining());
         } catch (IOException e) {
             e.printStackTrace();
-            return "";
         }
+        return s;
     }
 
     public static String generateHTML(HashMap<DayOfWeek, ArrayList<String>> dayMap){
@@ -97,7 +93,7 @@ public class FreeRoomDSB {
         return s;
     }
 
-    public static String download(String roomNumber, String token) throws IOException {
+    public static String download(String roomNumber, String token) throws DSBNotLoadableException {
 
         Calendar calendar = Calendar.getInstance(Locale.GERMANY);
         int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
@@ -106,44 +102,39 @@ public class FreeRoomDSB {
         if (week.length() == 1){
             week = "0" + week;
         }
+        try {
+            URL connectwat = new URL("https://light.dsbcontrol.de/DSBlightWebsite/Data/a7f2b46b-4d23-446e-8382-404d55c31f90/" + token + "/" + week + "/r/r" + roomNumber + ".htm");
+            HttpsURLConnection urlConnection = (HttpsURLConnection) connectwat.openConnection();
 
-        URL connectwat = new URL("https://light.dsbcontrol.de/DSBlightWebsite/Data/a7f2b46b-4d23-446e-8382-404d55c31f90/" + token + "/" + week + "/r/r" + roomNumber + ".htm");
-        HttpsURLConnection urlConnection = (HttpsURLConnection) connectwat.openConnection();
+            urlConnection.connect();
 
-        urlConnection.connect();
-
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(urlConnection.getInputStream());
-        char c;
-        StringBuilder stringBuilder = new StringBuilder();
-        while (((int) (c = (char) bufferedInputStream.read())) != 65535) {
-            stringBuilder.append(c);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.ISO_8859_1));
+            return bufferedReader.lines().collect(Collectors.joining());
+        }catch (IOException e) {
+            throw new DSBNotLoadableException(e);
         }
-        bufferedInputStream.close();
-        return stringBuilder.toString();
 
     }
 
-    public static String getToken() throws JSONException, IOException {
+    public static String getToken() throws DSBNotLoadableException {
+        try {
+            URL connectwat = new URL("https://mobileapi.dsbcontrol.de/dsbtimetables?authid=a7f2b46b-4d23-446e-8382-404d55c31f90");
+            HttpsURLConnection urlConnection = (HttpsURLConnection) connectwat.openConnection();
 
-        URL connectwat = new URL("https://mobileapi.dsbcontrol.de/dsbtimetables?authid=a7f2b46b-4d23-446e-8382-404d55c31f90");
-        HttpsURLConnection urlConnection = (HttpsURLConnection) connectwat.openConnection();
+            urlConnection.connect();
 
-        urlConnection.connect();
-
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(urlConnection.getInputStream());
-        char c;
-        StringBuilder stringBuilder = new StringBuilder();
-        while (((int) (c = (char) bufferedInputStream.read())) != 65535) {
-            stringBuilder.append(c);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String s = bufferedReader.lines().collect(Collectors.joining());
+            JSONArray array = new JSONArray(s);
+            JSONObject object = (JSONObject) array.get(0);
+            return (String) object.get("Id");
+        }catch (IOException e) {
+            throw new DSBNotLoadableException(e);
         }
-        bufferedInputStream.close();
-        JSONArray array = new JSONArray(stringBuilder.toString());
-        JSONObject object = (JSONObject)array.get(0);
-        return (String)object.get("Id");
-
     }
 
-    public static String refresh() throws IOException, JSONException {
+
+    public static String refresh() throws DSBNotLoadableException {
         String token = getToken();
         HashMap<DayOfWeek, ArrayList<String>> allMap = getFreeLessons(download("00027", token));
         for (int i = 28; i <= 46; i++) {

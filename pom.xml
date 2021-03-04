@@ -12,11 +12,19 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/Berstanio/GHGSEK2DSBParser/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>de.berstanio</groupId>
-            <artifactId>GHGSEK2DSBParser</artifactId>
-            <version>1.1</version>
+            <artifactId>ghgsek2dsbparser</artifactId>
+            <version>1.2</version>
         </dependency>
     </dependencies>
     <build>
